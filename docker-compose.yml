@@ -1,0 +1,15 @@
+postgres:
+  image: mdillon/postgis
+  ports:
+    - "5591:5432"
+  volumes_from:
+    - pgdata
+  environment:
+    POSTGRES_USER: db
+    POSTGRES_PASSWORD: db
+    POSTGRES_DB: db
+
+pgdata:
+  image: busybox
+  volumes:
+    - /data
