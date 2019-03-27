@@ -37,5 +37,5 @@ database:
   database: "_env:YESOD_PGDATABASE:db"
   poolsize: "_env:YESOD_PGPOOLSIZE:10"
 
-# copyright: Insert copyright statement here
+copyright: Insert copyright statement here
 #analytics: UA-YOURCODE

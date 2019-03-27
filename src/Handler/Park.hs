@@ -7,8 +7,11 @@ module Handler.Park where
 
 import Import
 
-getParkR :: Text -> Handler Html
-getParkR id = defaultLayout $ do
-  -- boo <- "boo"
-  setTitle "Park's Page"
-  $(widgetFile "park")
+
+getParkR :: ParkId -> Handler Html
+getParkR parkId = do
+  park <- runDB $ get404 parkId
+
+  defaultLayout $ do
+    setTitle $ toHtml (parkName park)
+    $(widgetFile "park")

@@ -15,4 +15,4 @@
 
 
 -- TODO: Make ParkId next
-/park/#Text ParkR GET
+/park/#ParkId ParkR GET

@@ -1,7 +1,8 @@
 <div .ui.container>
 
-    <h1>
-      <!-- Park #{boo} -->
+    <h1>#{parkName park}
 
-    <p>
-      This is info about a park. The id is #{id}
+    $maybe address <- parkAddress park
+      <h2> #{address}
+    $nothing
+
