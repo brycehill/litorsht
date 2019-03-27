@@ -3,9 +3,7 @@
 After installing Postgres, run:
 
 ```
-createuser litorsht --password litorsht --superuser
-createdb litorsht
-createdb litorsht_test
+docker-compose up -d
 ```
 
 ## Haskell Setup
