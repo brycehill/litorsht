@@ -78,6 +78,18 @@ executables:
     when:
     - condition: flag(library-only)
       buildable: false
+  seed:
+    main: Seed.hs
+    source-dirs: db
+    dependencies:
+    - base
+    - litorsht
+    - monad-logger
+    - persistent
+    - persistent-postgresql
+    when:
+    - condition: flag(library-only)
+      buildable: false
 
 # Test suite
 tests:
