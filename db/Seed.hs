@@ -1,11 +1,20 @@
 {-# LANGUAGE NoImplicitPrelude, OverloadedStrings #-}
 import Import
 import Model
+import Prelude ((!!))
+
 import Control.Monad.Logger (runStderrLoggingT)
 import Database.Persist.Postgresql (pgConnStr, withPostgresqlConn, runSqlConn, rawExecute)
+import System.Random (randomRIO)
+
+getRandomElem :: [a] -> IO a
+getRandomElem xs = fmap (xs !!) $ randomRIO (0, length xs - 1)
 
 insertPark :: MonadIO m => (Text, Maybe Text) -> ReaderT SqlBackend m ()
-insertPark (name, address) = insert_ $ Park name address
+insertPark (name, address) = do
+  (doubleRims, lit, numBaskets, rating, notes) <- liftIO $ getRandomElem courts
+  parkId <- insert $ Park name address
+  insert_ $ Court doubleRims lit numBaskets rating (Just notes) (Just parkId)
 
 parks :: [(Text, Maybe Text)]
 parks =
@@ -15,8 +24,9 @@ parks =
   , ("Centennial", Just "2475 E Markwood Dr, Chandler, AZ 85286")
   ]
 
-courts :: []
-courts = []
+courts :: [(Bool, Bool, Int, Int, Text)]
+courts =
+  [(True, True, 2, 4, ""), (True, True, 2, 3, ""), (False, False, 2, 4, "")]
 
 main :: IO ()
 main = do

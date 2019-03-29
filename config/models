@@ -12,9 +12,11 @@ Email
     verkey Text Maybe
     UniqueEmail email
 Court
-  rim Text
-  light Text
-  rating Text
+  double_rims Bool default=False
+  lit Bool default=False
+  number_of_baskets Int default=0
+  rating Int default=0
+  notes Text Maybe
   parkId ParkId Maybe
   deriving Show
 Park
