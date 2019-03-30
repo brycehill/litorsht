@@ -30,7 +30,7 @@ getHomeR = do
 
   defaultLayout $ do
     aDomId <- newIdent
-    setTitle "Welcome To Yesod!"
+    setTitle "Lit or Sht"
     $(widgetFile "homepage")
 
 postHomeR :: Handler Html
@@ -43,7 +43,7 @@ postHomeR = do
 
   defaultLayout $ do
     aDomId <- newIdent
-    setTitle "Welcome To Yesod!"
+    setTitle "Lit or Sht"
     $(widgetFile "homepage")
 
 sampleForm :: Form FileForm

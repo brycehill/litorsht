@@ -5,4 +5,9 @@
     $maybe address <- parkAddress park
       <h2> #{address}
     $nothing
+    <ul>
+      <li>Double Rims: #{courtDouble_rims court}
+      <li>Lit: #{courtLit court}
+      <li>Number of Baskets: #{courtNumber_of_baskets court}
+      <li>Rating: #{courtRating court}
 

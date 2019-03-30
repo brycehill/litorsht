@@ -17,7 +17,7 @@ Court
   number_of_baskets Int default=0
   rating Int default=0
   notes Text Maybe
-  parkId ParkId Maybe
+  parkId ParkId
   deriving Show
 Park
   name Text

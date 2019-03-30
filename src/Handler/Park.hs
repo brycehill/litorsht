@@ -6,12 +6,20 @@
 module Handler.Park where
 
 import Import
+import Database.Persist.Sql (rawSql)
 
 
 getParkR :: ParkId -> Handler Html
 getParkR parkId = do
-  park <- runDB $ get404 parkId
+  -- TODO: Esqueleto?
+  res <- runDB $ rawSql
+    "SELECT ??, ?? FROM park LEFT JOIN court ON park.id = court.park_id WHERE park.id=?;"
+    [toPersistValue parkId]
 
   defaultLayout $ do
-    setTitle $ toHtml (parkName park)
-    $(widgetFile "park")
+    case res of
+      [(Entity _ park, Entity _ court)] -> do
+        setTitle $ toHtml (parkName park)
+        $(widgetFile "park")
+      _ -> notFound
+
