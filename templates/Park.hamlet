@@ -7,7 +7,10 @@
     $nothing
     <ul>
       <li>Double Rims: #{courtDouble_rims court}
-      <li>Lit: #{courtLit court}
+      $if courtLit court
+        <li> 🔥
+      $else
+        <li> 💩
       <li>Number of Baskets: #{courtNumber_of_baskets court}
       <li>Rating: #{courtRating court}
 
