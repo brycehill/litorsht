@@ -6,13 +6,17 @@
 module Handler.Home where
 
 import Import
+import Database.Persist.Sql (rawSql)
 
 getHomeR :: Handler Html
 getHomeR = do
-  parks <- runDB $ selectList [] [Asc ParkName]
+-- TODO asc on park name and then pass in filters/sorts from query params
+  parks <- runDB $ rawSql
+    "SELECT ??, ?? FROM park LEFT JOIN court ON park.id = court.park_id;"
+    []
 
   defaultLayout $ do
-    setTitle "Lit or Sht"
+    setTitle "🔥 or 💩- Lit or Sht"
     $(widgetFile "homepage")
 
 

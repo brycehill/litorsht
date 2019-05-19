@@ -1,17 +1,22 @@
 <div .container>
-  <div .row>
-    <h1 #start>
-      🔥 or 💩
+  <!-- <div .row> -->
+  <!--   <h1 #start> -->
+  <!--     🔥 or 💩 -->
 
 <div .container>
   <!-- TODO: Parks Near You -->
   <h1> Parks
   <ul .parkList>
-    $forall Entity parkId park <- parks
+    $forall (Entity parkId park, Entity _ court) <- parks
       <li .parkItem>
         <a href=@{ParkR parkId}>
           <h2 .parkName>#{parkName park}
           <div>
               #{parkCity park}, #{parkState park}
+          <div>
+            $if courtLit court
+              🔥
+            $else
+              💩
 
 

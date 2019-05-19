@@ -23,20 +23,35 @@ insertPark (name, image, address, city, state, zip) = do
 
 parks :: [ParkSeed]
 parks =
-  [ ( "Meadowbrook"
+  [ ( "Meadowbrook Park"
     , Nothing
     , Just "3377 South Layton Lakes Boulevard"
     , "Chandler"
     , "AZ"
     , "85286"
     )
-  , ( "Centennial"
+  , ( "Centennial Park"
     , Nothing
     , Just "2475 E Markwood Dr"
     , "Chandler"
     , "AZ"
     , "85286"
     )
+  , ( "Desert Ridge High School"
+    , Nothing
+    , Just "10045 E Madero Ave"
+    , "Mesa"
+    , "AZ"
+    , "85209"
+    )
+  , ( "Roadrunner Park"
+    , Nothing
+    , Just "3495 E Ryan Rd"
+    , "Chandler"
+    , "AZ"
+    , "85286"
+    )
+  , ("Kensington Estates Park", Nothing, Nothing, "Gilbert", "AZ", "85297")
   ]
 
 
