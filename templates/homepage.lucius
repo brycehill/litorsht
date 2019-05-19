@@ -1,2 +1,22 @@
 
 /* Home Page Styles*/
+
+.parkList {
+padding:0;
+  display:grid;
+  /* grid-template-columns: 100px; */
+  grid-template-rows: 200px;
+  grid-column-gap: 10px;
+  grid-row-gap: 15px;
+}
+
+.parkItem {
+  list-style-type:none;
+  padding: 18px 20px;
+  border: 1px solid gray;
+  border-radius: 4px;
+}
+
+.parkName {
+
+}

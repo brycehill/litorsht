@@ -6,7 +6,12 @@
 <div .container>
   <!-- TODO: Parks Near You -->
   <h1> Parks
-  $forall Entity parkId park <- parks
-    <li>
-      <a href=@{ParkR parkId}>#{parkName park}
+  <ul .parkList>
+    $forall Entity parkId park <- parks
+      <li .parkItem>
+        <a href=@{ParkR parkId}>
+          <h2 .parkName>#{parkName park}
+          <div>
+              #{parkCity park}, #{parkState park}
+
 

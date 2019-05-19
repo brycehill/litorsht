@@ -21,4 +21,8 @@ Court
   deriving Show
 Park
   name Text
+  image Text Maybe
   address Text Maybe
+  city Text
+  state Text
+  zip Text

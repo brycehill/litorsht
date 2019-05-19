@@ -7,23 +7,44 @@ import Control.Monad.Logger (runStderrLoggingT)
 import Database.Persist.Postgresql (pgConnStr, withPostgresqlConn, runSqlConn, rawExecute)
 import System.Random (randomRIO)
 
+-- TODO: First delete data
+--
+--
 getRandomElem :: [a] -> IO a
 getRandomElem xs = fmap (xs !!) $ randomRIO (0, length xs - 1)
 
-insertPark :: MonadIO m => (Text, Maybe Text) -> ReaderT SqlBackend m ()
-insertPark (name, address) = do
-  (doubleRims, lit, numBaskets, rating, notes) <- liftIO $ getRandomElem courts
-  parkId <- insert $ Park name address
-  insert_ $ Court doubleRims lit numBaskets rating (Just notes) (Just parkId)
+type ParkSeed = (Text, Maybe Text, Maybe Text, Text, Text, Text)
 
-parks :: [(Text, Maybe Text)]
+insertPark :: MonadIO m => ParkSeed -> ReaderT SqlBackend m ()
+insertPark (name, image, address, city, state, zip) = do
+  (doubleRims, lit, numBaskets, rating, notes) <- liftIO $ getRandomElem courts
+  parkId <- insert $ Park name image address city state zip
+  insert_ $ Court doubleRims lit numBaskets rating (Just notes) (parkId)
+
+parks :: [ParkSeed]
 parks =
   [ ( "Meadowbrook"
-    , Just "3377 South Layton Lakes Boulevard, Chandler, AZ 85286"
+    , Nothing
+    , Just "3377 South Layton Lakes Boulevard"
+    , "Chandler"
+    , "AZ"
+    , "85286"
     )
-  , ("Centennial", Just "2475 E Markwood Dr, Chandler, AZ 85286")
+  , ( "Centennial"
+    , Nothing
+    , Just "2475 E Markwood Dr"
+    , "Chandler"
+    , "AZ"
+    , "85286"
+    )
   ]
 
+
+  -- double_rims Bool
+  -- lit Bool
+  -- number_of_baskets Int
+  -- rating Int
+  -- notes Text
 courts :: [(Bool, Bool, Int, Int, Text)]
 courts =
   [(True, True, 2, 4, ""), (True, True, 2, 3, ""), (False, False, 2, 4, "")]
