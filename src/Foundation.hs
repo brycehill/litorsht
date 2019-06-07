@@ -3,6 +3,8 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE ViewPatterns #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE RankNTypes #-}
@@ -14,17 +16,22 @@ import Import.NoFoundation
 import Database.Persist.Sql (ConnectionPool, runSqlPool)
 import Text.Hamlet          (hamletFile)
 import Text.Jasmine         (minifym)
+import Text.Read (readMaybe)
 import Control.Monad.Logger (LogSource)
 
 -- Used only when in "auth-dummy-login" setting is enabled.
 import Yesod.Auth.Dummy
 
-import Yesod.Auth.OpenId    (authOpenId, IdentifierType (Claimed))
+import Yesod.Auth
+import Yesod.Auth.Message
+-- import Yesod.Auth.OpenId    (authOpenId, IdentifierType (Claimed))
+import Yesod.Auth.Hardcoded
 import Yesod.Default.Util   (addStaticContentExternal)
 import Yesod.Core.Types     (Logger)
 import qualified Yesod.Core.Unsafe as Unsafe
 import qualified Data.CaseInsensitive as CI
 import qualified Data.Text.Encoding as TE
+
 
 -- | The foundation datatype for your application. This can be a good place to
 -- keep settings and values requiring initialization before your application
@@ -47,6 +54,10 @@ data MenuItem = MenuItem
 data MenuTypes
     = NavbarLeft MenuItem
     | NavbarRight MenuItem
+
+instance PathPiece (Either UserId Text) where
+  fromPathPiece = readMaybe . unpack
+  toPathPiece = pack . show
 
 -- This is where we define all of the routes in our application. For a full
 -- explanation of the syntax, please see:
@@ -115,11 +126,6 @@ instance Yesod App where
                     , menuItemRoute = HomeR
                     , menuItemAccessCallback = True
                     }
-                , NavbarLeft $ MenuItem
-                    { menuItemLabel = "Profile"
-                    , menuItemRoute = ProfileR
-                    , menuItemAccessCallback = isJust muser
-                    }
                 ]
 
         let navbarLeftMenuItems = [x | NavbarLeft x <- menuItems]
@@ -140,9 +146,7 @@ instance Yesod App where
         withUrlRenderer $(hamletFile "templates/default-layout-wrapper.hamlet")
 
     -- The page to be redirected to when authentication is required.
-    authRoute
-        :: App
-        -> Maybe (Route App)
+    authRoute :: App -> Maybe (Route App)
     authRoute _ = Just $ AuthR LoginR
 
     isAuthorized
@@ -159,7 +163,7 @@ instance Yesod App where
 
     -- the profile route requires that the user is authenticated, so we
     -- delegate to that function
-    isAuthorized ProfileR _ = isAuthenticated
+    isAuthorized AdminR _ = isAuthenticated
 
     -- This function creates static content files in the static folder
     -- and names them based on a hash of their content. This allows
@@ -221,8 +225,13 @@ instance YesodPersistRunner App where
     getDBRunner :: Handler (DBRunner App, Handler ())
     getDBRunner = defaultGetDBRunner appConnPool
 
+data SiteManager = SiteManager
+  { manUserName :: Text
+  , manPassWord :: Text }
+  deriving Show
+
 instance YesodAuth App where
-    type AuthId App = UserId
+    type AuthId App = Either UserId Text
 
     -- Where to send a user after successful login
     loginDest :: App -> Route App
@@ -236,18 +245,16 @@ instance YesodAuth App where
 
     authenticate :: (MonadHandler m, HandlerSite m ~ App)
                  => Creds App -> m (AuthenticationResult App)
-    authenticate creds = liftHandler $ runDB $ do
-        x <- getBy $ UniqueUser $ credsIdent creds
-        case x of
-            Just (Entity uid _) -> return $ Authenticated uid
-            Nothing -> Authenticated <$> insert User
-                { userIdent = credsIdent creds
-                , userPassword = Nothing
-                }
+    authenticate Creds{..} =
+      return
+        (case credsPlugin of
+          "hardcoded" ->
+            case lookupUser credsIdent of
+              Nothing -> UserError InvalidLogin
+              Just m  -> Authenticated (Right (manUserName m)))
 
-    -- You can add other plugins like Google Email, email or OAuth here
     authPlugins :: App -> [AuthPlugin App]
-    authPlugins app = [authOpenId Claimed []] ++ extraAuthPlugins
+    authPlugins app = [authHardcoded] ++ extraAuthPlugins
         -- Enable authDummy login if enabled.
         where extraAuthPlugins = [authDummy | appAuthDummyLogin $ appSettings app]
 
@@ -259,7 +266,31 @@ isAuthenticated = do
     Nothing -> Unauthorized "You must login to access this page"
     Just _  -> Authorized
 
-instance YesodAuthPersist App
+
+
+
+-- lookupUser :: Text -> Maybe SiteManager
+lookupUser username = find (\m -> manUserName m == username) siteManagers
+
+validPassword :: Text -> Text -> Bool
+validPassword u p =
+  case find (\m -> manUserName m == u && manPassWord m == p) siteManagers of
+    Just _ -> True
+    _      -> False
+
+instance YesodAuthPersist App where
+  type AuthEntity App = Either User SiteManager
+
+  getAuthEntity (Left uid) = do
+    x <- liftHandler $ runDB (get uid)
+    return (Left <$> x)
+  getAuthEntity (Right username) = return (Right <$> lookupUser username)
+
+
+
+instance YesodAuthHardcoded App where
+  validatePassword u = return . validPassword u
+  doesUserNameExist  = return . isJust . lookupUser
 
 -- This instance is required to use forms. You can modify renderMessage to
 -- achieve customized and internationalized form validation messages.
