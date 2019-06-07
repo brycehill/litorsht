@@ -19,12 +19,7 @@ import Text.Jasmine         (minifym)
 import Text.Read (readMaybe)
 import Control.Monad.Logger (LogSource)
 
--- Used only when in "auth-dummy-login" setting is enabled.
-import Yesod.Auth.Dummy
-
-import Yesod.Auth
 import Yesod.Auth.Message
--- import Yesod.Auth.OpenId    (authOpenId, IdentifierType (Claimed))
 import Yesod.Auth.Hardcoded
 import Yesod.Default.Util   (addStaticContentExternal)
 import Yesod.Core.Types     (Logger)
@@ -129,10 +124,7 @@ instance Yesod App where
                 ]
 
         let navbarLeftMenuItems = [x | NavbarLeft x <- menuItems]
-        let navbarRightMenuItems = [x | NavbarRight x <- menuItems]
-
         let navbarLeftFilteredMenuItems = [x | x <- navbarLeftMenuItems, menuItemAccessCallback x]
-        let navbarRightFilteredMenuItems = [x | x <- navbarRightMenuItems, menuItemAccessCallback x]
 
         -- We break up the default layout into two components:
         -- default-layout is the contents of the body tag, and
@@ -233,15 +225,14 @@ data SiteManager = SiteManager
 instance YesodAuth App where
     type AuthId App = Either UserId Text
 
-    -- Where to send a user after successful login
     loginDest :: App -> Route App
-    loginDest _ = HomeR
-    -- Where to send a user after logout
+    loginDest _ = AdminR
+
     logoutDest :: App -> Route App
     logoutDest _ = HomeR
-    -- Override the above two destinations when a Referer: header is present
-    redirectToReferer :: App -> Bool
-    redirectToReferer _ = True
+
+    authPlugins :: App -> [AuthPlugin App]
+    authPlugins app = [authHardcoded]
 
     authenticate :: (MonadHandler m, HandlerSite m ~ App)
                  => Creds App -> m (AuthenticationResult App)
@@ -253,10 +244,6 @@ instance YesodAuth App where
               Nothing -> UserError InvalidLogin
               Just m  -> Authenticated (Right (manUserName m)))
 
-    authPlugins :: App -> [AuthPlugin App]
-    authPlugins app = [authHardcoded] ++ extraAuthPlugins
-        -- Enable authDummy login if enabled.
-        where extraAuthPlugins = [authDummy | appAuthDummyLogin $ appSettings app]
 
 -- | Access function to determine if a user is logged in.
 isAuthenticated :: Handler AuthResult
@@ -269,7 +256,7 @@ isAuthenticated = do
 
 
 
--- lookupUser :: Text -> Maybe SiteManager
+lookupUser :: Text -> Maybe SiteManager
 lookupUser username = find (\m -> manUserName m == username) siteManagers
 
 validPassword :: Text -> Text -> Bool
