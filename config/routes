@@ -12,5 +12,6 @@
 /admin AdminR GET
 
 
--- TODO: Make ParkId next
+/park CreateParkR POST
 /park/#ParkId ParkR GET
+

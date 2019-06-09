@@ -16,7 +16,7 @@ Court
   lit Bool default=False
   number_of_baskets Int default=0
   rating Int default=0
-  notes Text Maybe
+  notes Textarea Maybe
   parkId ParkId
   deriving Show
 Park
@@ -26,3 +26,4 @@ Park
   city Text
   state Text
   zip Text
+  deriving Show

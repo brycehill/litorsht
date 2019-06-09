@@ -18,6 +18,8 @@
             <ul .nav.navbar-nav.navbar-right>
                 $maybe _ <- muser
                     <li>
+                        <a href="@{AdminR}">Admin
+                    <li>
                         <a href="@{AuthR LogoutR}">Logout
                 $nothing
                     <li>

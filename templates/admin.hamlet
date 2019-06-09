@@ -1,1 +1,13 @@
-hey
+$case pResult
+    $of FormSuccess park
+        <p> Park Created! #{parkName park}
+    $of FormFailure _
+        <p>Invalid input, let's try again.
+    $of _
+        <p>
+<h1> Add a park
+<form method="post" action=@{CreateParkR} enctype=#{pEnctype}>
+  ^{pForm}
+  <button type="submit">Add
+
+
