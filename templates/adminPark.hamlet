@@ -4,3 +4,6 @@
 <form method="post" action=@{AdminParkR parkId} enctype=#{pEnctype}>
   ^{pForm}
   <button type="submit">Update
+<form method="post" action=@{AdminParkR parkId} enctype=#{cEnctype}>
+  ^{cForm}
+  <button type="submit">Update

@@ -20,15 +20,15 @@ parkForm mPark =
     <*> areq textField "state"   (parkState <$> mPark)
     <*> areq textField "zip"     (parkZip <$> mPark)
 
-courtForm :: ParkId -> Form Court
-courtForm parkId =
+courtForm :: ParkId -> Maybe Court -> Form Court
+courtForm parkId mCourt =
   renderDivs
     $   Court
-    <$> areq (boolField)   "Double Rims"       Nothing
-    <*> areq (boolField)   "Lit"               Nothing
-    <*> areq intField      "Number of Baskets" Nothing
-    <*> areq intField      "Rating"            Nothing
-    <*> aopt textareaField "Notes"             Nothing
+    <$> areq (boolField)   "Double Rims"       (courtDouble_rims <$> mCourt)
+    <*> areq (boolField)   "Lit"               (courtLit <$> mCourt)
+    <*> areq intField "Number of Baskets" (courtNumber_of_baskets <$> mCourt)
+    <*> areq intField      "Rating"            (courtRating <$> mCourt)
+    <*> aopt textareaField "Notes"             (courtNotes <$> mCourt)
     <*> pure parkId
 
 getAdminR :: Handler Html
@@ -59,15 +59,26 @@ getAdminParkR parkId = do
     [toPersistValue parkId]
 
   case res of
-    [(Entity parkId park, Entity _ court)] -> do
+    [(Entity parkId park, Entity courtId court)] -> do
       ((pResult, pForm), pEnctype) <- runFormPost $ parkForm (Just park)
+      ((cResult, cForm), cEnctype) <- runFormPost
+        $ courtForm parkId (Just court)
       case pResult of
         FormSuccess park -> do
           runDB $ replace parkId park
           defaultLayout $ do
             setTitle $ toHtml (parkName park)
             $(widgetFile "adminPark")
-        FormMissing -> defaultLayout $ do
+        _ -> defaultLayout $ do
+          setTitle $ toHtml (parkName park)
+          $(widgetFile "adminPark")
+      case cResult of
+        FormSuccess court -> do
+          runDB $ replace courtId court
+          defaultLayout $ do
+            setTitle $ toHtml (parkName park)
+            $(widgetFile "adminPark")
+        _ -> defaultLayout $ do
           setTitle $ toHtml (parkName park)
           $(widgetFile "adminPark")
     _ -> notFound
