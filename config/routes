@@ -10,6 +10,7 @@
 / HomeR GET
 
 /admin AdminR GET
+/admin/park/#ParkId AdminParkR GET
 
 
 /park CreateParkR POST

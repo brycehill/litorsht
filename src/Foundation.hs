@@ -154,9 +154,10 @@ instance Yesod App where
     isAuthorized (CreateParkR) _ = return Authorized
     isAuthorized (StaticR _) _ = return Authorized
 
-    -- the profile route requires that the user is authenticated, so we
+    -- the admin routes require that the user is authenticated, so we
     -- delegate to that function
     isAuthorized AdminR _ = isAuthenticated
+    isAuthorized (AdminParkR _) _ = isAuthenticated
 
     -- This function creates static content files in the static folder
     -- and names them based on a hash of their content. This allows

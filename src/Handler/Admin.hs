@@ -6,6 +6,7 @@
 module Handler.Admin where
 
 import Import
+import Database.Persist.Sql (rawSql)
 
 
 parkForm :: Form Park
@@ -36,6 +37,8 @@ getAdminR = do
   case pResult of
     FormSuccess park -> do
       parkId  <- runDB $ insert park
+      -- Insert a court to prevent exceptions on the home page
+      -- TODO: fix those exceptions
       courtId <- runDB $ insert $ Court False False 0 0 (Just "") parkId
       defaultLayout $ do
         setTitle "admin"
@@ -48,4 +51,17 @@ getAdminR = do
 
 postCreateParkR :: Handler Html
 postCreateParkR = getAdminR
+
+getAdminParkR :: ParkId -> Handler Html
+getAdminParkR parkId = do
+  res <- runDB $ rawSql
+    "SELECT ??, ?? FROM park LEFT JOIN court ON park.id = court.park_id WHERE park.id=?;"
+    [toPersistValue parkId]
+
+  defaultLayout $ do
+    case res of
+      [(Entity _ park, Entity _ court)] -> do
+        setTitle $ toHtml (parkName park)
+        $(widgetFile "adminPark")
+      _ -> notFound
 
