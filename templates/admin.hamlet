@@ -8,6 +8,6 @@ $case pResult
 <h1> Add a park
 <form method="post" action=@{CreateParkR} enctype=#{pEnctype}>
   ^{pForm}
-  <button type="submit">Add
+  <button type="submit">Create
 
 

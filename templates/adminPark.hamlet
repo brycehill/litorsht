@@ -1,0 +1,6 @@
+<h1> #{parkName park}
+<h2> #{courtDouble_rims court}
+
+<form method="post" action=@{AdminParkR parkId} enctype=#{pEnctype}>
+  ^{pForm}
+  <button type="submit">Update

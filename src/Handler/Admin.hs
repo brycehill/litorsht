@@ -9,16 +9,16 @@ import Import
 import Database.Persist.Sql (rawSql)
 
 
-parkForm :: Form Park
-parkForm =
+parkForm :: Maybe Park -> Form Park
+parkForm mPark =
   renderDivs
     $   Park
-    <$> areq textField "name"    Nothing
-    <*> aopt textField "image"   Nothing
-    <*> aopt textField "address" Nothing
-    <*> areq textField "city"    Nothing
-    <*> areq textField "state"   Nothing
-    <*> areq textField "zip"     Nothing
+    <$> areq textField "name"    (parkName <$> mPark)
+    <*> aopt textField "image"   (parkImage <$> mPark)
+    <*> aopt textField "address" (parkAddress <$> mPark)
+    <*> areq textField "city"    (parkCity <$> mPark)
+    <*> areq textField "state"   (parkState <$> mPark)
+    <*> areq textField "zip"     (parkZip <$> mPark)
 
 courtForm :: ParkId -> Form Court
 courtForm parkId =
@@ -33,7 +33,7 @@ courtForm parkId =
 
 getAdminR :: Handler Html
 getAdminR = do
-  ((pResult, pForm), pEnctype) <- runFormPost parkForm
+  ((pResult, pForm), pEnctype) <- runFormPost (parkForm Nothing)
   case pResult of
     FormSuccess park -> do
       parkId  <- runDB $ insert park
@@ -58,10 +58,18 @@ getAdminParkR parkId = do
     "SELECT ??, ?? FROM park LEFT JOIN court ON park.id = court.park_id WHERE park.id=?;"
     [toPersistValue parkId]
 
-  defaultLayout $ do
-    case res of
-      [(Entity _ park, Entity _ court)] -> do
-        setTitle $ toHtml (parkName park)
-        $(widgetFile "adminPark")
-      _ -> notFound
+  case res of
+    [(Entity parkId park, Entity _ court)] -> do
+      ((pResult, pForm), pEnctype) <- runFormPost $ parkForm (Just park)
+      case pResult of
+        FormSuccess park -> do
+          runDB $ replace parkId park
+          defaultLayout $ do
+            setTitle $ toHtml (parkName park)
+            $(widgetFile "adminPark")
+        FormMissing -> defaultLayout $ do
+          setTitle $ toHtml (parkName park)
+          $(widgetFile "adminPark")
+    _ -> notFound
 
+postAdminParkR = getAdminParkR
