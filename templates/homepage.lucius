@@ -1,11 +1,20 @@
 
 /* Home Page Styles*/
 
+body{
+/* background: #fe5f55; */
+}
+/* #fe5f55 */
+/* #F2F3F7 */
+/* #885053 
+   #91F5AD
+   #190F10 
+*/
 .parkList {
   padding: 0;
   display: grid;
   grid-template-rows: repeat(5, 200px);
-grid-template-columns:max-content;
+  grid-template-columns:max-content;
   grid-column-gap: 10px;
   grid-row-gap: 15px;
   width: 100%;
@@ -13,12 +22,38 @@ grid-template-columns:max-content;
 }
 
 .parkItem {
-  list-style-type:none;
+/* background-color: #F2f3f7; */
+  display: block;
   padding: 18px 20px;
   border-radius: 4px;
-  box-shadow:2px 2px 8px lightgray;
+  box-shadow: 2px 2px 8px #D9DBE7;
+
+
+
+  transition: color 200ms ease-in, box-shadow 200ms ease-in;
+  color: #16171F;
+}
+
+.parkItem:hover {
+  box-shadow: 2px 2px 18px #D9DBE7;
+  text-decoration: none;
+  color: #16171F;
 }
 
 .parkName {
+display: inline-block;
+  border-bottom: 1px dashed transparent;
+  transition: border 200ms ease-in;
+}
 
+.parkItem:hover .parkName {
+  border-bottom-color: #91F5AD;
+
+}
+
+
+.parkInfo {
+  color: #8388AF;
+  font-size: 12px;
+  text-transform: uppercase;
 }

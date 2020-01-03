@@ -12,6 +12,8 @@
 /admin AdminR GET
 /admin/park/#ParkId AdminParkR GET POST
 
+-- /court/#CourtId UpdateCourtR PUT
+
 
 /park CreateParkR POST
 /park/#ParkId ParkR GET

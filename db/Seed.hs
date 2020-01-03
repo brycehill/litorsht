@@ -60,7 +60,7 @@ parks =
   -- number_of_baskets Int
   -- rating Int
   -- notes Text
-courts :: [(Bool, Bool, Int, Int, Text)]
+courts :: [(Bool, Bool, Int, Int, Textarea)]
 courts =
   [(True, True, 2, 4, ""), (True, True, 2, 3, ""), (False, False, 2, 4, "")]
 

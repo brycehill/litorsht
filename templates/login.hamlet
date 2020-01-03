@@ -1,0 +1,8 @@
+<form method="post" action="@{AuthR LoginR}">
+  <label>
+    email <input type="text">
+  <label>
+    password
+    <input type="password">
+  <button type="submit">
+    Login

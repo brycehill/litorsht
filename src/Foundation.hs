@@ -224,6 +224,10 @@ data SiteManager = SiteManager
   , manPassWord :: Text }
   deriving Show
 
+siteManagers = [SiteManager "admin" "admin"]
+siteManagers :: [SiteManager]
+
+
 instance YesodAuth App where
     type AuthId App = Either UserId Text
 
